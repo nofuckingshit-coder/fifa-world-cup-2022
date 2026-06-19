@@ -1,0 +1,70 @@
+// SHOGO:CUSTOM prisma-header
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+// SHOGO:CUSTOM-END
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  @@map("users")
+}
+
+model Team {
+  id           String   @id @default(cuid())
+  name         String
+  code         String   @unique
+  group        String
+  flag         String
+  wins         Int      @default(0)
+  draws        Int      @default(0)
+  losses       Int      @default(0)
+  goalsFor     Int      @default(0) @map("goals_for")
+  goalsAgainst Int      @default(0) @map("goals_against")
+  points       Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+  players Player[]
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+  @@map("teams")
+}
+
+model Player {
+  id        String  @id @default(cuid())
+  name      String
+  position  String
+  number    Int
+  goals     Int     @default(0)
+  assists   Int     @default(0)
+  yellowCards Int   @default(0) @map("yellow_cards")
+  redCards  Int     @default(0) @map("red_cards")
+  image     String?
+  teamId String @map("team_id")
+  team   Team   @relation(fields: [teamId], references: [id])
+  @@map("players")
+}
+
+model Match {
+  id         String   @id @default(cuid())
+  matchday   Int
+  group      String
+  status     String   @default("scheduled")
+  homeScore  Int?     @map("home_score")
+  awayScore  Int?     @map("away_score")
+  venue      String
+  date       DateTime
+  createdAt  DateTime @default(now()) @map("created_at")
+  homeTeamId String @map("home_team_id")
+  homeTeam   Team   @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeamId String @map("away_team_id")
+  awayTeam   Team   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  @@map("matches")
+}
