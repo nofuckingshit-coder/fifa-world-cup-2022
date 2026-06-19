@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.shogo/
+*.db
+*.db-journal
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+memory/
